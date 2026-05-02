@@ -918,25 +918,10 @@
   }
 
   .stat-box {
-    min-height: unset;
+    min-height: 160px;
+    max-height: 160px;
     overflow-y: auto;
-    max-height: 220px;
-  }
-
-  .stat-desc {
-    position: static;
-    opacity: 1;
-    transform: none;
-    background: none;
-    padding: 0.8rem 0 0;
-  }
-
-  .stat-desc-title {
-    font-size: 0.62rem;
-  }
-
-  .stat-desc-text {
-    font-size: 0.75rem;
+    overflow-x: hidden;
   }
 
   .stat-inner {
@@ -945,8 +930,19 @@
   }
 
   .stat-default {
-    opacity: 1;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .stat-desc {
+    position: static;
+    opacity: 0;
     transform: none;
+    background: none;
+    padding: 0.8rem 0 0;
+    height: 0;
+    overflow: hidden;
+    transition: none;
   }
 
   .stat-tag {
