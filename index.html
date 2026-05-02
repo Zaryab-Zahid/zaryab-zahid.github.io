@@ -918,74 +918,64 @@
   }
 
   .stat-box {
-    min-height: 100px;
+    max-height: 90px;
     overflow: hidden;
     transition: max-height 0.4s ease;
-    max-height: 100px;
     cursor: pointer;
+    padding: 0;
+    border: 1px solid var(--dim);
+    background: var(--bg3);
+    border-radius: 3px;
   }
 
-  /* reset ALL desktop positioning */
   .stat-box::before,
-  .stat-box::after { display: none !important; }
-
+  .stat-box::after,
   .stat-inner,
   .stat-default,
-  .stat-desc {
-    all: unset;
-    display: block;
+  .stat-desc { display: none !important; }
+
+  .m-card-top {
+    padding: 1rem 1.2rem;
   }
 
-  .stat-inner {
-    padding: 1rem;
-  }
-
-  .stat-num {
+  .m-card-num {
     font-size: 1.6rem;
     font-weight: 800;
     color: var(--accent);
-    display: block;
+    line-height: 1;
   }
 
-  .stat-label {
-    font-size: 0.68rem;
+  .m-card-label {
+    font-size: 0.65rem;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-top: 0.3rem;
-    display: block;
   }
 
-  .stat-desc {
-    padding: 0 1rem 1rem;
-    margin-top: 0.5rem;
+  .m-card-desc {
+    padding: 0.8rem 1.2rem 1.2rem;
     border-top: 1px solid var(--dim);
   }
 
-  .stat-desc-bar { display: none; }
-
-  .stat-desc-title {
+  .m-card-title {
     font-size: 0.65rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--accent2);
-    display: block;
-    margin-bottom: 0.4rem;
-    margin-top: 0.8rem;
+    margin-bottom: 0.5rem;
   }
 
-  .stat-desc-text {
+  .m-card-text {
     font-size: 0.78rem;
     line-height: 1.7;
     color: var(--muted);
-    display: block;
   }
 
-  .stat-tag { display: none; }
-
   .stat-box.active {
-    max-height: 400px;
+    max-height: 300px;
     overflow-y: auto;
+    border-color: rgba(79,172,254,0.3);
   }
 }
 </style>
@@ -1440,6 +1430,23 @@ document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
   }// Mobile card tap to reveal
 if (window.matchMedia('(max-width: 1024px)').matches) {
   document.querySelectorAll('.stat-box').forEach(box => {
+    // flatten card structure for mobile
+    const num = box.querySelector('.stat-num');
+    const label = box.querySelector('.stat-label');
+    const descTitle = box.querySelector('.stat-desc-title');
+    const descText = box.querySelector('.stat-desc-text');
+
+    box.innerHTML = `
+      <div class="m-card-top">
+        <div class="m-card-num">${num ? num.textContent : ''}</div>
+        <div class="m-card-label">${label ? label.textContent : ''}</div>
+      </div>
+      <div class="m-card-desc">
+        <div class="m-card-title">${descTitle ? descTitle.textContent : ''}</div>
+        <div class="m-card-text">${descText ? descText.textContent : ''}</div>
+      </div>
+    `;
+
     box.addEventListener('click', () => {
       const isActive = box.classList.contains('active');
       document.querySelectorAll('.stat-box').forEach(b => b.classList.remove('active'));
