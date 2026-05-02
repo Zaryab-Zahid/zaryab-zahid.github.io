@@ -911,6 +911,47 @@
   0%, 100% { box-shadow: 0 0 6px #28ca41; }
   50% { box-shadow: 0 0 14px #28ca41, 0 0 24px rgba(40,202,65,0.4); }
 }
+@media (max-width: 1024px) {
+  .about-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .stat-box {
+    min-height: unset;
+    overflow: visible;
+  }
+
+  .stat-desc {
+    position: static;
+    opacity: 1;
+    transform: none;
+    background: none;
+    padding: 0.8rem 0 0;
+  }
+
+  .stat-desc-title {
+    font-size: 0.62rem;
+  }
+
+  .stat-desc-text {
+    font-size: 0.75rem;
+  }
+
+  .stat-inner {
+    position: static;
+    padding: 1rem;
+  }
+
+  .stat-default {
+    opacity: 1;
+    transform: none;
+  }
+
+  .stat-tag {
+    display: none;
+  }
+}
 </style>
 </head>
 <body>
