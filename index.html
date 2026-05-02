@@ -918,15 +918,20 @@
   }
 
   .stat-box {
-    min-height: 160px;
-    max-height: 160px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    min-height: 130px;
+    max-height: 130px;
+    overflow: hidden;
+    transition: max-height 0.4s ease, border-color 0.3s;
+    cursor: pointer;
+  }
+
+  .stat-box.active {
+    max-height: 300px;
   }
 
   .stat-inner {
     position: static;
-    padding: 1rem;
+    padding: 1.2rem;
   }
 
   .stat-default {
@@ -937,17 +942,26 @@
   .stat-desc {
     position: static;
     opacity: 0;
+    max-height: 0;
+    overflow: hidden;
     transform: none;
     background: none;
-    padding: 0.8rem 0 0;
-    height: 0;
-    overflow: hidden;
-    transition: none;
+    padding: 0 1.2rem;
+    transition: opacity 0.3s ease, max-height 0.4s ease, padding 0.3s ease;
   }
 
-  .stat-tag {
-    display: none;
+  .stat-box.active .stat-desc {
+    opacity: 1;
+    max-height: 200px;
+    padding: 0 1.2rem 1.2rem;
   }
+
+  .stat-box.active .stat-default {
+    opacity: 0.4 !important;
+  }
+
+  .stat-tag { display: none; }
+  .stat-box::after { display: none; }
 }
 </style>
 </head>
@@ -1398,7 +1412,16 @@ document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
     btn.textContent = 'Message Sent ✓';
     btn.style.background = '#28ca41';
     setTimeout(() => { btn.textContent = 'Send Message'; btn.style.background = ''; }, 3000);
-  }
+  }// Mobile card tap to reveal
+if (window.matchMedia('(max-width: 1024px)').matches) {
+  document.querySelectorAll('.stat-box').forEach(box => {
+    box.addEventListener('click', () => {
+      const isActive = box.classList.contains('active');
+      document.querySelectorAll('.stat-box').forEach(b => b.classList.remove('active'));
+      if (!isActive) box.classList.add('active');
+    });
+  });
+}
 </script>
 </body>
 </html>
