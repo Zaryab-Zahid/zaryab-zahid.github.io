@@ -807,6 +807,28 @@ footer span{display:block;margin-top:4px;font-family:'JetBrains Mono',monospace;
 
 .edx .tk{font-size:.6rem}
 @media(max-width:560px){.edx .tk span:nth-child(even){visibility:hidden}}
+
+/* ===== Hero: neural network graph ===== */
+#csvg .ed{fill:none;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-opacity .25s,stroke-width .25s}
+#csvg .nd{opacity:0}
+#csvg .halo{fill:#6D8196;opacity:0}
+#csvg .pu{fill:#fff;stroke:#2B2B2B;stroke-width:1.4;opacity:0}
+#csvg .lab{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase}
+
+/* ===== Hero network: smooth / flowy version ===== */
+#csvg{background:radial-gradient(ellipse 62% 72% at 50% 46%,rgba(109,129,150,.14),transparent 72%)}
+#csvg .ed{stroke-linecap:round}
+#csvg .tr{fill:#6D8196}
+#csvg .tr.hd{fill:#fff;stroke:#2B2B2B;stroke-width:1.3}
+#csvg .rip{fill:none;stroke:#6D8196;stroke-width:1.6;transform-box:fill-box;transform-origin:center;animation:rip 1s ease-out forwards;pointer-events:none}
+@keyframes rip{from{transform:scale(1);opacity:.85}to{transform:scale(3.2);opacity:0}}
+
+/* ===== performance ===== */
+nav{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(255,255,244,.97)}
+.bgnet{-webkit-mask-image:none;mask-image:none}
+.orb::before{mix-blend-mode:normal;opacity:.05}
+.orbit::before{filter:none}
+.off,.off *{animation-play-state:paused!important}
 </style>
 </head>
 <body>
@@ -820,11 +842,11 @@ footer span{display:block;margin-top:4px;font-family:'JetBrains Mono',monospace;
 
 <header class="hero vB"><div class="wrap"><div class="bl"><div class="pill"><i></i>machine learning engineer</div><h1><span class="w" style="animation-delay:.1s">Zaryab</span> <span class="w" style="animation-delay:.25s"><span class="hl">Zahid</span></span></h1><p class="sub">Building intelligent systems that solve real-world problems. Passionate about machine learning, data science, and turning raw data into meaningful insights.</p><div class="btns"><a class="btn p" href="#projects">View Projects →</a><a class="btn s" href="#contact">Get In Touch</a></div></div>
  <div class="chart" id="chart">
-  <div class="ch"><span>$ python train.py</span><span class="lg2"><i class="a"></i>loss <i class="b"></i>acc</span></div>
-  <div class="stat"><span class="sl s1">Loading dataset... done</span><span class="sl s2">Preprocessing data...</span><span class="sl s3">Training model: <em id="ep">epoch 1/10</em></span></div>
+  <div class="ch"><span>$ python network.py</span><span class="lg2"><i class="a"></i>− weight <i class="b"></i>+ weight</span></div>
+  <div class="stat"><span class="sl s1">Building layers... done</span><span class="sl s2">Connecting neurons... done</span><span class="sl s3">Sending signals: <em id="ep">0 passes</em></span></div>
   <div class="pbar"><i id="pb"></i></div>
-  <svg viewBox="0 0 480 228" id="csvg" role="img" aria-label="Training curves: loss falling to 0.0812, accuracy rising to 0.9743"></svg>
-  <div class="cs"><div><small>loss</small><b id="vl">0.0000</b></div><div><small>acc</small><b id="va">0.0000</b></div><div class="sv">Model saved: model.pkl</div></div>
+  <svg viewBox="0 0 480 228" id="csvg" role="img" aria-label="Animated neural network with 4 input, two hidden and 3 output neurons"></svg>
+  <div class="cs"><div><small>neurons</small><b id="vl">0</b></div><div><small>connections</small><b id="va">0</b></div><div class="sv">Architecture: 4 → 6 → 6 → 3</div></div>
   <div class="tip" id="tip"></div>
  </div></div><div class="fcs" id="fcs" aria-hidden="true"></div></header>
 
@@ -1032,32 +1054,44 @@ addEventListener('resize',layout);layout();
 (()=>{const f=3.5/8;document.getElementById('yfill').style.setProperty('--f',f);document.querySelector('.edx').style.setProperty('--f',f)})();
 
 const bgp=[...document.querySelectorAll('.bgp')];
-if(!matchMedia('(prefers-reduced-motion:reduce)').matches)addEventListener('scroll',()=>{const y=scrollY;bgp.forEach(e=>e.style.transform='translateY('+(y*e.dataset.k)+'px)')},{passive:true});
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches){let tk=0;addEventListener('scroll',()=>{if(tk)return;tk=1;requestAnimationFrame(()=>{tk=0;const y=scrollY;bgp.forEach(e=>e.style.transform='translateY('+(y*e.dataset.k)+'px)')})},{passive:true})}
 
 (()=>{
 const cv=document.getElementById('net'),cx=cv.getContext('2d');
 const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
-let W,H,N=[],mx=-999,my=-999;
-function size(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);
-  const n=Math.min(70,Math.round(W*H/21000));N=Array.from({length:n},(_,i)=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:i%9===0?3.4:1.9}));}
-function frame(){
+let W,H,N=[],run=false,last=0,prev=0;
+function size(){const d=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);
+  const n=Math.min(56,Math.round(W*H/24000));N=Array.from({length:n},(_,i)=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:i%9===0?3.4:1.9,w:1}))}
+const LV=5,B=Array.from({length:LV},()=>[]);
+function frame(now){
+  if(document.hidden){run=false;return}
+  if(!still&&now-last<30){requestAnimationFrame(frame);return}
+  const k=still?0:Math.min(3,(now-(prev||now-16.7))/16.7);last=now;prev=now;
   cx.clearRect(0,0,W,H);
-  for(const p of N){if(!still){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1}}
+  for(const p of N){if(k){p.x+=p.vx*k;p.y+=p.vy*k;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1}
+    const nx=(p.x-W*.5)/(W*.95),ny=(p.y-H*.4)/(H*.85),r=Math.sqrt(nx*nx+ny*ny);p.w=r<=.35?1:Math.max(.35,1-(r-.35));}
+  B.forEach(x=>x.length=0);
   for(let i=0;i<N.length;i++){const a=N[i];
-    for(let j=i+1;j<N.length;j++){const b=N[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
-      if(d<150){cx.strokeStyle='rgba(109,129,150,'+(.30*(1-d/150))+')';cx.lineWidth=1;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke()}}
-    cx.fillStyle='rgba(109,129,150,.6)';cx.beginPath();cx.arc(a.x,a.y,a.r,0,6.283);cx.fill();
-  }
+    for(let j=i+1;j<N.length;j++){const b=N[j],dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy;
+      if(d2<22500){const al=(1-Math.sqrt(d2)/150)*(a.w+b.w)/2;B[Math.min(LV-1,(al*LV)|0)].push(a.x,a.y,b.x,b.y)}}}
+  cx.lineWidth=1;
+  for(let l=0;l<LV;l++){const q=B[l];if(!q.length)continue;cx.strokeStyle='rgba(109,129,150,'+((l+.5)/LV*.30).toFixed(3)+')';cx.beginPath();
+    for(let i=0;i<q.length;i+=4){cx.moveTo(q[i],q[i+1]);cx.lineTo(q[i+2],q[i+3])}cx.stroke()}
+  cx.fillStyle='rgb(109,129,150)';
+  for(const p of N){cx.globalAlpha=.6*p.w;cx.beginPath();cx.arc(p.x,p.y,p.r,0,6.283);cx.fill()}
+  cx.globalAlpha=1;
   if(!still)requestAnimationFrame(frame);
 }
-let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{size();if(still)frame()},150)});
-size();frame();
+function kick(){if(!run&&!still&&!document.hidden){run=true;prev=0;requestAnimationFrame(frame)}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)kick()});
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{size();if(still)frame(performance.now())},150)});
+size();if(still)frame(performance.now());else kick();
 })();
 
 (()=>{const t=document.querySelector('.hero .term');if(!t)return;
 const flat=matchMedia('(prefers-reduced-motion:reduce)').matches;
-function f(){const k=flat?1:Math.min(1,scrollY/320);t.style.transform='perspective(1400px) rotateX('+((1-k)*11)+'deg) scale('+(.95+.05*k)+')'}
-addEventListener('scroll',f,{passive:true});f();})();
+let lk=-1;function f(){const k=flat?1:Math.min(1,scrollY/320);if(k===lk)return;lk=k;t.style.transform='perspective(1400px) rotateX('+((1-k)*11)+'deg) scale('+(.95+.05*k)+')'}
+let tk=0;addEventListener('scroll',()=>{if(tk)return;tk=1;requestAnimationFrame(()=>{tk=0;f()})},{passive:true});f();})();
 
 
 (()=>{const hero=document.querySelector('.hero'),box=document.getElementById('fcs');
@@ -1098,38 +1132,68 @@ layout();})();
 
 (()=>{const svg=document.getElementById('csvg');if(!svg)return;
 const chart=document.getElementById('chart'),tip=document.getElementById('tip'),vl=document.getElementById('vl'),va=document.getElementById('va'),ep=document.getElementById('ep'),pb=document.getElementById('pb');
-const X0=40,X1=464,Y0=192,Y1=16,k=.55,den=1-Math.exp(-9*k);
-const f=e=>(Math.exp(-k*(e-1))-Math.exp(-9*k))/den,g=e=>(1-Math.exp(-k*(e-1)))/den;
-const loss=e=>.0812+(.4231-.0812)*f(e),acc=e=>.8812+(.9743-.8812)*g(e);
-const px=e=>X0+(e-1)/9*(X1-X0),yl=v=>Y0-(v/.5)*(Y0-Y1),ya=v=>Y0-((v-.85)/.15)*(Y0-Y1);
-const path=(fn,sc)=>{let d='';for(let e=1;e<=10.001;e+=.25)d+=(d?'L':'M')+px(e).toFixed(1)+' '+sc(fn(e)).toFixed(1);return d};
-let h='<defs><clipPath id="cp"><rect id="cr" x="'+X0+'" y="0" width="0" height="228"/></clipPath></defs>';
-for(let i=0;i<=4;i++){const y=Y0-i*(Y0-Y1)/4;h+=`<line class="gl" x1="${X0}" x2="${X1}" y1="${y}" y2="${y}"/>`}
-for(let e=1;e<=10;e++)h+=`<text x="${px(e)}" y="214" text-anchor="middle">${e}</text>`;
-h+=`<path d="${path(acc,ya)}L${px(10)} ${Y0}L${px(1)} ${Y0}Z" fill="rgba(109,129,150,.14)" clip-path="url(#cp)"/>`;
-h+=`<path class="ln" id="p1" pathLength="1" d="${path(loss,yl)}" stroke="#2B2B2B"/><path class="ln" id="p2" pathLength="1" d="${path(acc,ya)}" stroke="#6D8196"/>`;
-h+=`<circle class="dt" cx="${px(10)}" cy="${yl(loss(10))}" r="4.5" fill="#2B2B2B"/><circle class="dt" cx="${px(10)}" cy="${ya(acc(10))}" r="4.5" fill="#6D8196"/>`;
-h+=`<text class="dt" x="${px(10)-9}" y="${yl(loss(10))-9}" text-anchor="end" style="fill:#2B2B2B;font-size:10.5px">0.0812</text><text class="dt" x="${px(10)-9}" y="${ya(acc(10))+17}" text-anchor="end" style="fill:#55697D;font-size:10.5px">0.9743</text>`;
-h+=`<g id="hv" opacity="0"><line id="hl" y1="${Y1}" y2="${Y0}" stroke="#8A8F96" stroke-dasharray="3 3"/><circle id="h1" r="5" fill="#2B2B2B"/><circle id="h2" r="5" fill="#6D8196"/></g>`;
+const L=[4,6,6,3],XS=[64,184,304,424],BOW=[-10,13,-13,10],NAMES=['input','hidden 1','hidden 2','output'];
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),sm=t=>t*t*(3-2*t);
+const N=[];L.forEach((n,l)=>{const gap=Math.min(34,150/(n-1));for(let i=0;i<n;i++){const t=n>1?i/(n-1):.5;N.push({l,i,bx:XS[l]+BOW[l]*Math.sin(t*Math.PI),by:100+(i-(n-1)/2)*gap,ph:rnd()*6.28,a:.2+rnd()*.75,act:0,sc:.5,x:0,y:0})}});
+const layer=l=>N.filter(n=>n.l===l);
+const E=[];for(let l=0;l<3;l++)for(const a of layer(l))for(const b of layer(l+1))E.push({a,b,l,w:rnd()*2-1,so:.1,sw:1});
+const NEU=N.length,CON=E.length;
+let h='<defs><radialGradient id="ng" cx="35%" cy="30%"><stop offset="0" stop-color="#B7C8D8"/><stop offset="1" stop-color="#55697D"/></radialGradient><radialGradient id="ng2" cx="35%" cy="30%"><stop offset="0" stop-color="#7A7A7A"/><stop offset="1" stop-color="#2B2B2B"/></radialGradient></defs>';
+for(let l=0;l<4;l++)h+=`<text class="lab" x="${XS[l]}" y="216" text-anchor="middle">${NAMES[l]}</text>`;
+h+='<g id="eg">';
+E.forEach(e=>{h+=`<path class="ed" pathLength="1" d="" stroke="${e.w>0?'#6D8196':'#2B2B2B'}"/>`});h+='</g><g>';
+N.forEach(n=>{h+=`<g class="nd"><circle class="halo" r="18"/><circle class="core" r="9" fill="url(#${n.l===3?'ng2':'ng'})" stroke="#FFFFF4" stroke-width="1.6"/><circle cx="-2.8" cy="-3" r="2.4" fill="#fff" opacity=".5"/></g>`});
+h+='</g><g id="tg"></g><g id="rg"></g>';
 svg.innerHTML=h;
-const p1=document.getElementById('p1'),p2=document.getElementById('p2'),cr=document.getElementById('cr'),hv=document.getElementById('hv'),hl=document.getElementById('hl'),h1=document.getElementById('h1'),h2=document.getElementById('h2');
+const eg=[...svg.querySelectorAll('#eg .ed')];E.forEach((e,i)=>e.el=eg[i]);
+const ng=[...svg.querySelectorAll('.nd')];N.forEach((n,i)=>{n.g=ng[i];n.halo=n.g.querySelector('.halo');n.core=n.g.querySelector('.core')});
+const tg=svg.querySelector('#tg'),rg=svg.querySelector('#rg');
+const SLOTS=7,TL=7,slots=[];for(let s=0;s<SLOTS;s++){const c=[];for(let j=0;j<TL;j++){const e=document.createElementNS('http://www.w3.org/2000/svg','circle');e.setAttribute('class','tr'+(j?'':' hd'));e.setAttribute('r',3.6-j*.4);e.style.opacity=0;tg.appendChild(e);c.push(e)}slots.push({c,p:null})}
+const dxe=e=>(e.b.x-e.a.x)*.5;
+function layout(now){N.forEach(n=>{if(still){n.x=n.bx;n.y=n.by}else{n.x=n.bx+Math.cos(now*.0007+n.ph)*2.6;n.y=n.by+Math.sin(now*.0009+n.ph*1.3)*3.6}
+  n.g.setAttribute('transform',`translate(${n.x.toFixed(1)} ${n.y.toFixed(1)}) scale(${n.sc.toFixed(2)})`)});
+ E.forEach(e=>{const d=dxe(e);e.el.setAttribute('d',`M${e.a.x.toFixed(1)} ${e.a.y.toFixed(1)}C${(e.a.x+d).toFixed(1)} ${e.a.y.toFixed(1)} ${(e.b.x-d).toFixed(1)} ${e.b.y.toFixed(1)} ${e.b.x.toFixed(1)} ${e.b.y.toFixed(1)}`)})}
+function reveal(p){N.forEach(n=>{const o=cl(p*3.4-(n.l-.5),0,1);n.g.style.opacity=o;n.sc=.5+.5*sm(o)});
+ E.forEach(e=>{const r=cl(p*3-e.l,0,1);e.so=+(.1+Math.abs(e.w)*.5*p).toFixed(3);e.sw=+(.8+Math.abs(e.w)*1.9*p).toFixed(2);
+  e.el.style.strokeDashoffset=1-sm(r);if(!hov){e.el.style.strokeOpacity=e.so;e.el.style.strokeWidth=e.sw}})}
 const S=[...chart.querySelectorAll('.sl')],D=[.3,.9,1.5],T0=1.7,TD=3.1;
-const still=matchMedia('(prefers-reduced-motion:reduce)').matches;let done=false;
-function set(e,p){p1.style.strokeDashoffset=1-p;p2.style.strokeDashoffset=1-p;cr.setAttribute('width',px(e)-X0);vl.textContent=loss(e).toFixed(4);va.textContent=acc(e).toFixed(4);ep.textContent='epoch '+Math.min(10,Math.floor(e))+'/10';pb.style.width=(p*100)+'%'}
-function finish(){done=true;set(10,1);svg.classList.add('done');chart.classList.add('fin');S.forEach(x=>x.classList.add('on'))}
+let done=false,hov=null,passes=0,nextSp=0;const SEG=720;
+function set(p){vl.textContent=Math.round(NEU*p);va.textContent=Math.round(CON*p);pb.style.width=(p*100)+'%';reveal(p)}
+const pick=l=>{const a=layer(l);return a[Math.floor(Math.random()*a.length)]};
+const bz=(a,b,t)=>{t=sm(cl(t));const d=(b.x-a.x)*.5,u=1-t;return[u*u*u*a.x+3*u*u*t*(a.x+d)+3*u*t*t*(b.x-d)+t*t*t*b.x,u*u*u*a.y+3*u*u*t*a.y+3*u*t*t*b.y+t*t*t*b.y]};
+function signals(now){if(now>nextSp){const s=slots.find(x=>!x.p);if(s){s.p={path:[pick(0),pick(1),pick(2),pick(3)],t0:now,k:0};}nextSp=now+260+Math.random()*260}
+ slots.forEach(s=>{const q=s.p;if(!q)return;const age=(now-q.t0)/SEG;
+  if(age>=3+TL*.06){s.c.forEach(c=>c.style.opacity=0);s.p=null;return}
+  const seg0=Math.floor(Math.min(age,3));while(q.k<seg0){q.k++;q.path[q.k].act=1;if(q.k===3){passes++;ep.textContent=passes+(passes===1?' pass':' passes')}}
+  s.c.forEach((c,j)=>{const tt=age-j*.06;if(tt<0||tt>3){c.style.opacity=0;return}const sg=Math.min(2,Math.floor(tt)),[x,y]=bz(q.path[sg],q.path[sg+1],tt-sg);c.setAttribute('cx',x.toFixed(1));c.setAttribute('cy',y.toFixed(1));c.style.opacity=(1-j/TL)*.9})})}
+function glow(now){N.forEach(n=>{n.act*=.94;const br=.12+.07*Math.sin(now*.0016+n.ph);n.halo.style.opacity=(still?.1:br+n.act*.5).toFixed(3);if(n.act>.004||n.rr){n.core.setAttribute('r',(9+n.act*2.6).toFixed(2));n.rr=n.act>.004}})}
+function finish(){done=true;set(1);svg.classList.add('done');chart.classList.add('fin');S.forEach(x=>x.classList.add('on'))}
 const t0=performance.now();
-function frame(now){const el=(now-t0)/1000;S.forEach((x,i)=>{if(el>D[i])x.classList.add('on')});
-  const q=Math.min(1,Math.max(0,(el-T0)/TD)),p=q<.5?2*q*q:1-Math.pow(-2*q+2,2)/2;set(1+9*p,p);
-  if(q>=1){finish();return}requestAnimationFrame(frame)}
-if(still)finish();else requestAnimationFrame(frame);
+let vis=true,run=false,last=0;
+function kick(){if(!run&&vis&&!document.hidden){run=true;requestAnimationFrame(frame)}}
+function frame(now){if(!vis||document.hidden){run=false;return}
+ if(now-last<28){requestAnimationFrame(frame);return}last=now;
+ const el=(now-t0)/1000;S.forEach((x,i)=>{if(el>D[i])x.classList.add('on')});
+ if(!done){const q=cl((el-T0)/TD),p=sm(q);set(p);if(q>=1)finish()}
+ layout(now);if(done)signals(now);glow(now);requestAnimationFrame(frame)}
+if(still){finish();layout(0);glow(0)}else kick();
+new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis)kick()},{rootMargin:'80px'}).observe(chart);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)kick()});
+function hi(n){E.forEach(e=>{const on=n&&(e.a===n||e.b===n);e.el.style.strokeOpacity=n?(on?.95:e.so*.25):e.so;e.el.style.strokeWidth=n&&on?(e.sw+1.2).toFixed(2):e.sw})}
+function ripple(n){const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('class','rip');c.setAttribute('cx',n.x.toFixed(1));c.setAttribute('cy',n.y.toFixed(1));c.setAttribute('r',10);rg.appendChild(c);c.addEventListener('animationend',()=>c.remove())}
 svg.addEventListener('pointermove',ev=>{if(!done)return;const r=svg.getBoundingClientRect(),cr2=chart.getBoundingClientRect();
-  const sx=(ev.clientX-r.left)/r.width*480,e=Math.min(10,Math.max(1,1+(sx-X0)/(X1-X0)*9)),x=px(e);
-  hv.setAttribute('opacity',1);hl.setAttribute('x1',x);hl.setAttribute('x2',x);h1.setAttribute('cx',x);h1.setAttribute('cy',yl(loss(e)));h2.setAttribute('cx',x);h2.setAttribute('cy',ya(acc(e)));
-  vl.textContent=loss(e).toFixed(4);va.textContent=acc(e).toFixed(4);
-  tip.innerHTML='epoch '+Math.round(e)+'/10<br>loss: <b>'+loss(e).toFixed(4)+'</b> acc: <b>'+acc(e).toFixed(4)+'</b>';
-  tip.style.left=Math.min(cr2.width-190,Math.max(8,ev.clientX-cr2.left+14))+'px';tip.style.top=(ev.clientY-cr2.top-56)+'px';tip.classList.add('on')});
-svg.addEventListener('pointerleave',()=>{if(!done)return;hv.setAttribute('opacity',0);tip.classList.remove('on');vl.textContent='0.0812';va.textContent='0.9743'});
+ const sx=(ev.clientX-r.left)/r.width*480,sy=(ev.clientY-r.top)/r.height*228;let b=null,bd=20*20;
+ N.forEach(n=>{const d=(n.x-sx)**2+(n.y-sy)**2;if(d<bd){bd=d;b=n}});
+ if(b!==hov){hov=b;hi(b);if(b){ripple(b);b.act=1}}
+ if(!b){tip.classList.remove('on');return}
+ tip.innerHTML=NAMES[b.l]+' · neuron '+(b.i+1)+'<br>activation: <b>'+b.a.toFixed(2)+'</b>';
+ tip.style.left=Math.min(cr2.width-170,Math.max(8,ev.clientX-cr2.left+14))+'px';tip.style.top=(ev.clientY-cr2.top-56)+'px';tip.classList.add('on')});
+svg.addEventListener('pointerleave',()=>{if(!done)return;hov=null;hi(null);tip.classList.remove('on')});
 })();
+(()=>{const io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('off',!e.isIntersecting)),{rootMargin:'160px'});
+document.querySelectorAll('#skills,.track,.mtrack').forEach(el=>io.observe(el))})();
 </script>
 </body>
 </html>
